@@ -14,3 +14,20 @@ export interface CommandHandler<C extends Command> {
 }
 // State
 export interface State {}
+
+// Query
+export interface Query {}
+
+// Query Handler
+export interface QueryHandler<Q extends Query> {
+  handleQuery(query: Q): void
+  canHandle(query: Q): boolean
+}
+// Read Model
+export interface ReadModel {
+  apply(event: DomainEvent): void
+}
+
+export interface ReadModelResponse {
+  data: any
+}

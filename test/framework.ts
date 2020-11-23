@@ -1,21 +1,37 @@
 import { ReserveSeatHandler } from "../src/reserve_seat_handler"
-import { Command, CommandHandler, DomainEvent } from "../src/arch"
+import { MyReservationHandler } from "../src/my_reservation_handler"
+import { CustomerReservation } from "../src/my_reservations"
+import { Command, CommandHandler, DomainEvent, Query, QueryHandler, ReadModel, ReadModelResponse } from "../src/arch"
 import { EventStore } from "../src/eventStore"
 import { expect } from "chai"
 
 export class TestFramework {
   eventStore: EventStore
   commandHandlers: CommandHandler<Command>[]
+  queyHandlers: QueryHandler<Query>[]
+  readModels: ReadModel[] = []
   publishedEvents: DomainEvent[] = []
+  response!: ReadModelResponse
 
   constructor() {
     this.eventStore = new EventStore()
     const eventBus = (e: DomainEvent) => this.publishedEvents.push(e)
     this.commandHandlers = [new ReserveSeatHandler(this.eventStore, eventBus)]
+    // Read Model List
+    const customerReservation = new CustomerReservation([])
+    this.readModels = [customerReservation]
+    this.queyHandlers = [
+      new MyReservationHandler(customerReservation, (res: ReadModelResponse) => {
+        this.response = res
+      }),
+    ]
   }
 
   given(events: DomainEvent[]) {
-    this.eventStore.add(events)
+    events.forEach((e) => {
+      this.eventStore.add(events)
+      this.readModels.forEach((r) => r.apply(e))
+    })
   }
 
   when(command: Command) {
@@ -25,5 +41,14 @@ export class TestFramework {
 
   then(events: DomainEvent[]) {
     expect(this.publishedEvents).deep.equal(events)
+  }
+
+  query(query: Query) {
+    const handler = this.queyHandlers.filter((h) => h.canHandle(query))
+    handler[0].handleQuery(query)
+  }
+
+  thenExpect(response: ReadModelResponse) {
+    expect(this.response).deep.equal(response)
   }
 }
