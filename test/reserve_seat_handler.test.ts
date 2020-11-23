@@ -11,13 +11,13 @@ describe("A Customer reserves specific seats at a specific screening (for simpli
   const screen1 = new ScreenId("screen1")
   const customer1 = new CustomerId("customer1")
   const customer2 = new CustomerId("customer2")
+  const tomorrow = moment().add(1, "days").toDate()
 
   beforeEach(() => {
     testFramework = new TestFramework()
   })
 
   it("If available, the seats should be reserved.", async () => {
-    const tomorrow = moment().add(1, "days").toDate()
     testFramework.given([new ScreenScheduled(screen1, tomorrow)])
     testFramework.when(new ReserveSeat(customer1, screen1, Row.A, Col.ONE))
     testFramework.then([new SeatReserved(customer1, screen1, new Seat(Row.A, Col.ONE))])
