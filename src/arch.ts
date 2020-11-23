@@ -1,5 +1,6 @@
 // Event
 export interface DomainEvent {
+  name: string
   relatedTo(event: DomainEvent): boolean
 }
 

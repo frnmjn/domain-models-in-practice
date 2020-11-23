@@ -34,7 +34,7 @@ export class Reservation {
   }
 
   reservationIsOnTime() {
-    return this.reservationState.screen.startTime > new Date(new Date().getTime() - 15 * 60 * 1000)
+    return new Date(this.reservationState.screen.startTime.getTime() - 15 * 60 * 1000) > new Date()
   }
 
   seatIsAvailable(seat: Seat) {
