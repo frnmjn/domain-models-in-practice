@@ -1,8 +1,4 @@
 {
     "version": "0.1",
-    "language": "en",
-    "words": [
-        "datetime",
-        "Parens"
-    ]
+    "language": "en"
 }

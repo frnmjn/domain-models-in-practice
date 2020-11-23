@@ -1,32 +1,29 @@
-import { expect } from "chai";
-import { Command, CommandHandler, DomainEvent } from "../src/seat";
+import { ReserveSeatHandler } from "../src/reserve_seat_handler"
+import { Command, CommandHandler, DomainEvent } from "../src/arch"
+import { EventStore } from "../src/eventStore"
+import { expect } from "chai"
 
-type Publish = (event: DomainEvent) => void;
-type HandlerFactory<T> = (history: DomainEvent[], publish: Publish) => CommandHandler<T>
+export class TestFramework {
+  eventStore: EventStore
+  commandHandlers: CommandHandler<Command>[]
+  publishedEvents: DomainEvent[] = []
 
-export interface Framework<T extends Command> {
-  readonly given: (events: DomainEvent[]) => void;
-  readonly when: (command: T) => void
-  readonly thenExpect: (events: DomainEvent[]) => void
-}
+  constructor() {
+    this.eventStore = new EventStore()
+    const eventBus = (e: DomainEvent) => this.publishedEvents.push(e)
+    this.commandHandlers = [new ReserveSeatHandler(this.eventStore, eventBus)]
+  }
 
-export type FrameworkFactory = <T extends Command>(handlerFactory: HandlerFactory<T>) => Framework<T>
-export const createFramework: FrameworkFactory = <T>(handlerFactory: HandlerFactory<T>) => {
-  let history: DomainEvent[] = [];
-  const publishedEvents: DomainEvent[] = [];
+  given(events: DomainEvent[]) {
+    this.eventStore.add(events)
+  }
 
-  return {
-    given: (events: DomainEvent[]): void => {
-      history = events
-    },
-    when: (command: T): void => {
-      const handler = handlerFactory(history, (event) => {
-        publishedEvents.push(event)
-      })
-      handler.handleCommand(command)
-    },
-    thenExpect(events: DomainEvent[]) {
-      expect(publishedEvents).to.be.eql(events)
-    }
+  when(command: Command) {
+    const handler = this.commandHandlers.filter((h) => h.canHandle(command))
+    handler[0].handleCommand(command)
+  }
+
+  then(events: DomainEvent[]) {
+    expect(this.publishedEvents).deep.equal(events)
   }
 }
