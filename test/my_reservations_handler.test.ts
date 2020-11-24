@@ -3,7 +3,7 @@ import { ScreenId } from "../src/screen"
 import { CustomerId } from "../src/customer"
 import { SeatReserved } from "../src/events"
 import { TestFramework } from "./framework"
-import { MyReservation } from "../src/my_reservation_handler"
+import { MyReservation } from "../src/my_reservations_handler"
 import { MyReservationResponse } from "../src/my_reservations"
 
 describe("As a Customer, when query for my reservation", () => {

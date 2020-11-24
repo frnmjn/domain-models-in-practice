@@ -1,11 +1,11 @@
 import { Row, Col, Seat } from "../src/seat"
 import { ScreenId } from "../src/screen"
 import { CustomerId } from "../src/customer"
-import { SeatReserved, SeatReservationRefused, ScreenScheduled } from "../src/events"
+import { SeatReserved, ScreenScheduled } from "../src/events"
 import { TestFramework } from "./framework"
 import { ReserveSeat } from "../src/reserve_seat_handler"
 import moment from "moment"
-import { MyReservation } from "../src/my_reservation_handler"
+import { MyReservation } from "../src/my_reservations_handler"
 import { MyReservationResponse } from "../src/my_reservations"
 
 describe("As Customer, I want reserve a seat for a screen", () => {

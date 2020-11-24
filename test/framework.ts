@@ -1,5 +1,5 @@
 import { ReserveSeatHandler } from "../src/reserve_seat_handler"
-import { MyReservationHandler } from "../src/my_reservation_handler"
+import { MyReservationHandler } from "../src/my_reservations_handler"
 import { CustomerReservation } from "../src/my_reservations"
 import { Command, CommandHandler, DomainEvent, Query, QueryHandler, ReadModel, ReadModelResponse } from "../src/arch"
 import { EventStore } from "../src/eventStore"
