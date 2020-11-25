@@ -13,6 +13,7 @@ import {
 import { EventStore } from "../src/infra/eventStore"
 import { expect } from "chai"
 import { ChooseSeatHandler } from "../src/command_handler/choose_seat_handler"
+import { CancellationChoiceHandler } from "../src/command_handler/cancellation_choice_handler"
 
 export class TestFramework {
   eventStore: EventStore
@@ -28,6 +29,7 @@ export class TestFramework {
     this.commandHandlers = [
       new ReserveSeatHandler(this.eventStore, eventBus),
       new ChooseSeatHandler(this.eventStore, eventBus),
+      new CancellationChoiceHandler(this.eventStore, eventBus),
     ]
     // Read Model List
     const customerReservation = new CustomerReservation([])

@@ -2,14 +2,22 @@ import { isEmpty } from "lodash"
 import moment from "moment"
 import { DomainEvent, State } from "../infra/arch"
 import { CustomerId } from "../value_object/customer"
-import { ScreenScheduled, SeatChosen, SeatChosenRefused, SeatReservationRefused, SeatReserved } from "./events"
+import {
+  ScreenScheduled,
+  SeatChosen,
+  SeatChosenCancelled,
+  SeatChosenCancellationRefused,
+  SeatChosenRefused,
+  SeatReservationRefused,
+  SeatReserved,
+} from "./events"
 import { ScreenId, Screen } from "../value_object/screen"
 import { Seat } from "../value_object/seat"
 
 // State
 export class ReservationState implements State {
   reservedSeat: Seat[] = []
-  chosenSeat: Seat[] = []
+  chosenSeat: ChosenSeat[] = []
   screen!: Screen
 
   constructor(events: DomainEvent[]) {
@@ -29,7 +37,7 @@ export class ReservationState implements State {
   }
 
   private applySeatChosen(event: SeatChosen) {
-    this.chosenSeat.push(event.seat)
+    this.chosenSeat.push(new ChosenSeat(event.seat, event.timestamp))
   }
 }
 
@@ -48,7 +56,7 @@ export class Reservation {
   seatIsAvailable(seat: Seat) {
     return (
       !this.reservationState.reservedSeat.find((s) => s.equals(seat)) &&
-      !this.reservationState.chosenSeat.find((s) => s.equals(seat))
+      !this.reservationState.chosenSeat.map((cs) => cs.seat).find((s) => s.equals(seat))
     )
   }
 
@@ -62,6 +70,13 @@ export class Reservation {
 
   rejectWindow() {
     return new Date() > moment(this.reservationState.screen.startTime).subtract(12, "minutes").toDate()
+  }
+
+  seatChosenShouldBeCancelled(seat: Seat) {
+    const chosenSeat = this.reservationState.chosenSeat.find((cs) => cs.seat.equals(seat))
+    if (!chosenSeat) throw new Error(``)
+
+    return moment().diff(moment(chosenSeat.timestamp), "minutes") > 12
   }
 
   reservationMustBeRejected() {
@@ -83,4 +98,16 @@ export class Reservation {
       this.publish(new SeatChosenRefused(customerId, screenId, seat))
     }
   }
+
+  cancelChosenSeat(customerId: CustomerId, screenId: ScreenId, seat: Seat) {
+    if (this.seatChosenShouldBeCancelled(seat)) {
+      this.publish(new SeatChosenCancelled(customerId, screenId, seat))
+    } else {
+      this.publish(new SeatChosenCancellationRefused(customerId, screenId, seat))
+    }
+  }
+}
+
+class ChosenSeat {
+  constructor(readonly seat: Seat, readonly timestamp: Date) {}
 }

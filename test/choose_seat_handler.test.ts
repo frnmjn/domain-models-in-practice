@@ -32,7 +32,7 @@ describe("A Customer choose specific seats at a specific screening (for simplici
     testFramework.then([new SeatChosenRefused(customer2, screen1, new Seat(Row.A, Col.ONE))])
   })
 
-  it("If available but 15 mins before start, the seats should not be reserved.", async () => {
+  it("If available but 15 mins before start, the seats should not be chosen.", async () => {
     testFramework.given([new ScreenScheduled(screen1, new Date())])
     testFramework.when(new ChooseSeat(customer1, screen1, Row.A, Col.ONE))
     testFramework.then([new SeatChosenRefused(customer1, screen1, new Seat(Row.A, Col.ONE))])
