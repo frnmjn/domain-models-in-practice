@@ -1,9 +1,9 @@
-import { Row, Col, Seat } from "../src/seat"
-import { ScreenId } from "../src/screen"
-import { CustomerId } from "../src/customer"
-import { SeatReserved, SeatReservationRefused, ScreenScheduled } from "../src/events"
+import { Row, Col, Seat } from "../src/value_object/seat"
+import { ScreenId } from "../src/value_object/screen"
+import { CustomerId } from "../src/value_object/customer"
+import { SeatReserved, SeatReservationRefused, ScreenScheduled } from "../src/aggregate/events"
 import { TestFramework } from "./framework"
-import { ReserveSeat } from "../src/reserve_seat_handler"
+import { ReserveSeat } from "../src/command_handler/reserve_seat_handler"
 import moment from "moment"
 
 describe("A Customer reserves specific seats at a specific screening (for simplicity, assume there exists only one screening)", () => {
@@ -12,6 +12,7 @@ describe("A Customer reserves specific seats at a specific screening (for simpli
   const customer1 = new CustomerId("customer1")
   const customer2 = new CustomerId("customer2")
   const tomorrow = moment().add(1, "days").toDate()
+  const in110Mins = moment().add(13, "minutes").toDate()
 
   beforeEach(() => {
     testFramework = new TestFramework()
@@ -36,6 +37,11 @@ describe("A Customer reserves specific seats at a specific screening (for simpli
       new ScreenScheduled(screen1, new Date()),
       new SeatReserved(customer1, screen1, new Seat(Row.A, Col.ONE)),
     ])
+    testFramework.when(new ReserveSeat(customer1, screen1, Row.A, Col.ONE))
+    testFramework.then([new SeatReservationRefused(customer1, screen1, new Seat(Row.A, Col.ONE))])
+  })
+  it.only("If available but 12 mins before start with no other reservation, the seats should not be reserved.", async () => {
+    testFramework.given([new ScreenScheduled(screen1, in110Mins)])
     testFramework.when(new ReserveSeat(customer1, screen1, Row.A, Col.ONE))
     testFramework.then([new SeatReservationRefused(customer1, screen1, new Seat(Row.A, Col.ONE))])
   })

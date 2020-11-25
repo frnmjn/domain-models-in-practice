@@ -1,6 +1,6 @@
 import { DomainEvent } from "./arch"
-import { ScreenId } from "./screen"
-import { ScreenEvent } from "./events"
+import { ScreenId } from "../value_object/screen"
+import { ScreenEvent } from "../aggregate/events"
 
 export class EventStore {
   events: DomainEvent[]

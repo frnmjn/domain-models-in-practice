@@ -1,8 +1,16 @@
-import { ReserveSeatHandler } from "../src/reserve_seat_handler"
-import { MyReservationHandler } from "../src/my_reservations_handler"
-import { CustomerReservation } from "../src/my_reservations"
-import { Command, CommandHandler, DomainEvent, Query, QueryHandler, ReadModel, ReadModelResponse } from "../src/arch"
-import { EventStore } from "../src/eventStore"
+import { ReserveSeatHandler } from "../src/command_handler/reserve_seat_handler"
+import { MyReservationHandler } from "../src/query_handler/my_reservations_handler"
+import { CustomerReservation } from "../src/read_model/my_reservations"
+import {
+  Command,
+  CommandHandler,
+  DomainEvent,
+  Query,
+  QueryHandler,
+  ReadModel,
+  ReadModelResponse,
+} from "../src/infra/arch"
+import { EventStore } from "../src/infra/eventStore"
 import { expect } from "chai"
 
 export class TestFramework {

@@ -1,8 +1,10 @@
-import { DomainEvent, State } from "./arch"
-import { CustomerId } from "./customer"
+import { isEmpty } from "lodash"
+import moment from "moment"
+import { DomainEvent, State } from "../infra/arch"
+import { CustomerId } from "../value_object/customer"
 import { ScreenScheduled, SeatReservationRefused, SeatReserved } from "./events"
-import { ScreenId, Screen } from "./screen"
-import { Seat } from "./seat"
+import { ScreenId, Screen } from "../value_object/screen"
+import { Seat } from "../value_object/seat"
 
 // State
 export class ReservationState implements State {
@@ -34,7 +36,7 @@ export class Reservation {
   }
 
   reservationIsOnTime() {
-    return new Date(this.reservationState.screen.startTime.getTime() - 15 * 60 * 1000) > new Date()
+    return moment(this.reservationState.screen.startTime).subtract(15, "minutes").toDate() > new Date()
   }
 
   seatIsAvailable(seat: Seat) {
@@ -43,6 +45,18 @@ export class Reservation {
 
   seatCanBeBooked(seat: Seat) {
     return this.reservationIsOnTime() && this.seatIsAvailable(seat)
+  }
+
+  noReservations() {
+    return isEmpty(this.reservationState.reservedSeat)
+  }
+
+  rejectWindow() {
+    return new Date() > moment(this.reservationState.screen.startTime).subtract(12, "minutes").toDate()
+  }
+
+  reservationMustBeRejected() {
+    return this.noReservations() && this.rejectWindow()
   }
 
   reserveSeat(customerId: CustomerId, screenId: ScreenId, seat: Seat) {

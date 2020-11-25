@@ -1,6 +1,6 @@
-import { Query, QueryHandler, ReadModelResponse } from "./arch"
-import { CustomerId } from "./customer"
-import { CustomerReservation as CustomerReservations } from "./my_reservations"
+import { Query, QueryHandler, ReadModelResponse } from "../infra/arch"
+import { CustomerId } from "../value_object/customer"
+import { CustomerReservation as CustomerReservations } from "../read_model/my_reservations"
 
 // Query
 export class MyReservation implements Query {

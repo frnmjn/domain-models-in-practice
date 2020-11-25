@@ -1,7 +1,7 @@
-import { DomainEvent, ReadModel, ReadModelResponse } from "./arch"
-import { CustomerId } from "./customer"
-import { SeatReserved } from "./events"
-import { Seat } from "./seat"
+import { DomainEvent, ReadModel, ReadModelResponse } from "../infra/arch"
+import { CustomerId } from "../value_object/customer"
+import { SeatReserved } from "../aggregate/events"
+import { Seat } from "../value_object/seat"
 
 // State
 export class CustomerReservation implements ReadModel {

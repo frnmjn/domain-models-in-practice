@@ -1,9 +1,9 @@
-import { Command, CommandHandler, DomainEvent } from "./arch"
-import { CustomerId } from "./customer"
-import { EventStore } from "./eventStore"
-import { Reservation, ReservationState } from "./reservation"
-import { ScreenId } from "./screen"
-import { Col, Row, Seat } from "./seat"
+import { Command, CommandHandler, DomainEvent } from "../infra/arch"
+import { CustomerId } from "../value_object/customer"
+import { EventStore } from "../infra/eventStore"
+import { Reservation, ReservationState } from "../aggregate/reservation"
+import { ScreenId } from "../value_object/screen"
+import { Col, Row, Seat } from "../value_object/seat"
 
 // Command
 export class ReserveSeat implements Command {

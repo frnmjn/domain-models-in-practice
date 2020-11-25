@@ -1,12 +1,12 @@
-import { Row, Col, Seat } from "../src/seat"
-import { ScreenId } from "../src/screen"
-import { CustomerId } from "../src/customer"
-import { SeatReserved, ScreenScheduled } from "../src/events"
+import { ScreenId } from "../src/value_object/screen"
+import { CustomerId } from "../src/value_object/customer"
+import { SeatReserved, ScreenScheduled } from "../src/aggregate/events"
 import { TestFramework } from "./framework"
-import { ReserveSeat } from "../src/reserve_seat_handler"
+import { ReserveSeat } from "../src/command_handler/reserve_seat_handler"
 import moment from "moment"
-import { MyReservation } from "../src/my_reservations_handler"
-import { MyReservationResponse } from "../src/my_reservations"
+import { MyReservation } from "../src/query_handler/my_reservations_handler"
+import { MyReservationResponse } from "../src/read_model/my_reservations"
+import { Seat, Row, Col } from "../src/value_object/seat"
 
 describe("As Customer, I want reserve a seat for a screen", () => {
   let testFramework: TestFramework

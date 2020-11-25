@@ -1,7 +1,7 @@
-import { DomainEvent } from "./arch"
-import { CustomerId } from "./customer"
-import { ScreenId } from "./screen"
-import { Seat } from "./seat"
+import { DomainEvent } from "../infra/arch"
+import { CustomerId } from "../value_object/customer"
+import { ScreenId } from "../value_object/screen"
+import { Seat } from "../value_object/seat"
 
 export abstract class ScreenEvent implements DomainEvent {
   constructor(readonly screenId: ScreenId) {}
