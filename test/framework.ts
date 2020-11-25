@@ -12,6 +12,7 @@ import {
 } from "../src/infra/arch"
 import { EventStore } from "../src/infra/eventStore"
 import { expect } from "chai"
+import { ChooseSeatHandler } from "../src/command_handler/choose_seat_handler"
 
 export class TestFramework {
   eventStore: EventStore
@@ -24,7 +25,10 @@ export class TestFramework {
   constructor() {
     this.eventStore = new EventStore()
     const eventBus = (e: DomainEvent) => this.publishedEvents.push(e)
-    this.commandHandlers = [new ReserveSeatHandler(this.eventStore, eventBus)]
+    this.commandHandlers = [
+      new ReserveSeatHandler(this.eventStore, eventBus),
+      new ChooseSeatHandler(this.eventStore, eventBus),
+    ]
     // Read Model List
     const customerReservation = new CustomerReservation([])
     this.readModels = [customerReservation]
@@ -36,10 +40,8 @@ export class TestFramework {
   }
 
   given(events: DomainEvent[]) {
-    events.forEach((e) => {
-      this.eventStore.add(events)
-      this.readModels.forEach((r) => r.apply(e))
-    })
+    this.eventStore.add(events)
+    events.forEach((e) => this.readModels.forEach((r) => r.apply(e)))
   }
 
   when(command: Command) {

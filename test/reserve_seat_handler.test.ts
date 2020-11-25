@@ -26,22 +26,14 @@ describe("A Customer reserves specific seats at a specific screening (for simpli
 
   it("If not available, the seats should not be reserved.", async () => {
     testFramework.given([
-      new ScreenScheduled(screen1, new Date()),
+      new ScreenScheduled(screen1, tomorrow),
       new SeatReserved(customer1, screen1, new Seat(Row.A, Col.ONE)),
     ])
     testFramework.when(new ReserveSeat(customer2, screen1, Row.A, Col.ONE))
     testFramework.then([new SeatReservationRefused(customer2, screen1, new Seat(Row.A, Col.ONE))])
   })
   it("If available but 15 mins before start, the seats should not be reserved.", async () => {
-    testFramework.given([
-      new ScreenScheduled(screen1, new Date()),
-      new SeatReserved(customer1, screen1, new Seat(Row.A, Col.ONE)),
-    ])
-    testFramework.when(new ReserveSeat(customer1, screen1, Row.A, Col.ONE))
-    testFramework.then([new SeatReservationRefused(customer1, screen1, new Seat(Row.A, Col.ONE))])
-  })
-  it.only("If available but 12 mins before start with no other reservation, the seats should not be reserved.", async () => {
-    testFramework.given([new ScreenScheduled(screen1, in110Mins)])
+    testFramework.given([new ScreenScheduled(screen1, new Date())])
     testFramework.when(new ReserveSeat(customer1, screen1, Row.A, Col.ONE))
     testFramework.then([new SeatReservationRefused(customer1, screen1, new Seat(Row.A, Col.ONE))])
   })

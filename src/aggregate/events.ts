@@ -18,7 +18,17 @@ export abstract class ReservationEvent implements DomainEvent {
   abstract name: string
 
   relatedTo(event: DomainEvent): boolean {
-    return event instanceof ScreenEvent
+    return event instanceof ReservationEvent
+  }
+}
+
+export abstract class ChooseSeatEvent implements DomainEvent {
+  constructor(readonly customerId: CustomerId, readonly screenId: ScreenId, readonly seat: Seat) {}
+
+  abstract name: string
+
+  relatedTo(event: DomainEvent): boolean {
+    return event instanceof ChooseSeatEvent
   }
 }
 
@@ -34,4 +44,11 @@ export class SeatReserved extends ReservationEvent {
 }
 export class SeatReservationRefused extends ReservationEvent {
   readonly name = "SeatReservationRefused"
+}
+
+export class SeatChosen extends ChooseSeatEvent {
+  readonly name = "SeatChosen"
+}
+export class SeatChosenRefused extends ChooseSeatEvent {
+  readonly name = "SeatChosenRefused"
 }

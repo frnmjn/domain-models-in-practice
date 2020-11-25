@@ -6,19 +6,19 @@ import { ScreenId } from "../value_object/screen"
 import { Col, Row, Seat } from "../value_object/seat"
 
 // Command
-export class ReserveSeat implements Command {
+export class ChooseSeat implements Command {
   constructor(readonly customerId: CustomerId, readonly screenId: ScreenId, readonly row: Row, readonly col: Col) {}
 }
 
 // Command Handler
-export class ReserveSeatHandler implements CommandHandler<ReserveSeat> {
+export class ChooseSeatHandler implements CommandHandler<ChooseSeat> {
   constructor(private readonly eventStore: EventStore, private readonly publish: (event: DomainEvent) => void) {}
 
   canHandle(command: Command) {
-    return command instanceof ReserveSeat
+    return command instanceof ChooseSeat
   }
 
-  handleCommand(reserveSeat: ReserveSeat) {
+  handleCommand(reserveSeat: ChooseSeat) {
     const customerId = reserveSeat.customerId
     const screenId = reserveSeat.screenId
     const seat = new Seat(reserveSeat.row, reserveSeat.col)
@@ -28,7 +28,7 @@ export class ReserveSeatHandler implements CommandHandler<ReserveSeat> {
 
     const reservation = new Reservation(reservationState, this.publish)
 
-    reservation.reserveSeat(customerId, screenId, seat)
+    reservation.choseSeat(customerId, screenId, seat)
 
     return "OK"
   }

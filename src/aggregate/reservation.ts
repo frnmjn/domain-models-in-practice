@@ -2,18 +2,20 @@ import { isEmpty } from "lodash"
 import moment from "moment"
 import { DomainEvent, State } from "../infra/arch"
 import { CustomerId } from "../value_object/customer"
-import { ScreenScheduled, SeatReservationRefused, SeatReserved } from "./events"
+import { ScreenScheduled, SeatChosen, SeatChosenRefused, SeatReservationRefused, SeatReserved } from "./events"
 import { ScreenId, Screen } from "../value_object/screen"
 import { Seat } from "../value_object/seat"
 
 // State
 export class ReservationState implements State {
   reservedSeat: Seat[] = []
+  chosenSeat: Seat[] = []
   screen!: Screen
 
   constructor(events: DomainEvent[]) {
     for (const event of events) {
       if (event instanceof ScreenScheduled) this.applyScreenScheduled(event)
+      if (event instanceof SeatChosen) this.applySeatChosen(event)
       if (event instanceof SeatReserved) this.applySeatReserved(event)
     }
   }
@@ -24,6 +26,10 @@ export class ReservationState implements State {
 
   private applySeatReserved(event: SeatReserved) {
     this.reservedSeat.push(event.seat)
+  }
+
+  private applySeatChosen(event: SeatChosen) {
+    this.chosenSeat.push(event.seat)
   }
 }
 
@@ -40,7 +46,10 @@ export class Reservation {
   }
 
   seatIsAvailable(seat: Seat) {
-    return !this.reservationState.reservedSeat.find((s) => s.equals(seat))
+    return (
+      !this.reservationState.reservedSeat.find((s) => s.equals(seat)) &&
+      !this.reservationState.chosenSeat.find((s) => s.equals(seat))
+    )
   }
 
   seatCanBeBooked(seat: Seat) {
@@ -64,6 +73,14 @@ export class Reservation {
       this.publish(new SeatReserved(customerId, screenId, seat))
     } else {
       this.publish(new SeatReservationRefused(customerId, screenId, seat))
+    }
+  }
+
+  choseSeat(customerId: CustomerId, screenId: ScreenId, seat: Seat) {
+    if (this.seatCanBeBooked(seat)) {
+      this.publish(new SeatChosen(customerId, screenId, seat))
+    } else {
+      this.publish(new SeatChosenRefused(customerId, screenId, seat))
     }
   }
 }
