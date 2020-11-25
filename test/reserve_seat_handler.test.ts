@@ -32,6 +32,7 @@ describe("A Customer reserves specific seats at a specific screening (for simpli
     testFramework.when(new ReserveSeat(customer2, screen1, Row.A, Col.ONE))
     testFramework.then([new SeatReservationRefused(customer2, screen1, new Seat(Row.A, Col.ONE))])
   })
+
   it("If available but 15 mins before start, the seats should not be reserved.", async () => {
     testFramework.given([new ScreenScheduled(screen1, new Date())])
     testFramework.when(new ReserveSeat(customer1, screen1, Row.A, Col.ONE))

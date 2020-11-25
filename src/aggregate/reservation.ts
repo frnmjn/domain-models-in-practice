@@ -24,6 +24,7 @@ export class ReservationState implements State {
     for (const event of events) {
       if (event instanceof ScreenScheduled) this.applyScreenScheduled(event)
       if (event instanceof SeatChosen) this.applySeatChosen(event)
+      if (event instanceof SeatChosenCancelled) this.applySeatChosenCancelled(event)
       if (event instanceof SeatReserved) this.applySeatReserved(event)
     }
   }
@@ -38,6 +39,10 @@ export class ReservationState implements State {
 
   private applySeatChosen(event: SeatChosen) {
     this.chosenSeat.push(new ChosenSeat(event.seat, event.timestamp))
+  }
+
+  private applySeatChosenCancelled(event: SeatChosenCancelled) {
+    this.chosenSeat = this.chosenSeat.filter((cs) => !cs.seat.equals(event.seat))
   }
 }
 

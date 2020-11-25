@@ -1,6 +1,6 @@
 import { DomainEvent } from "./arch"
 import { ScreenId } from "../value_object/screen"
-import { ChooseSeatEvent, ReservationEvent, ScreenEvent } from "../aggregate/events"
+import { ChooseSeatEvent, ReservationEvent, ScreenEvent, SeatChosenCancelled } from "../aggregate/events"
 
 export class EventStore {
   events: DomainEvent[]
@@ -24,7 +24,10 @@ export class EventStore {
   reservationEvents(screenId: ScreenId) {
     return this.events.filter(
       (e) =>
-        (e instanceof ReservationEvent || e instanceof ChooseSeatEvent || e instanceof ScreenEvent) &&
+        (e instanceof ReservationEvent ||
+          e instanceof ChooseSeatEvent ||
+          e instanceof ScreenEvent ||
+          e instanceof SeatChosenCancelled) &&
         e.screenId.equals(screenId)
     )
   }
