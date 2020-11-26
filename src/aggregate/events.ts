@@ -41,6 +41,16 @@ export abstract class SeatChosenCancellationEvent implements DomainEvent {
   }
 }
 
+export abstract class TimerEvent implements DomainEvent {
+  constructor(readonly time: Date = new Date()) {}
+
+  abstract name: string
+
+  relatedTo(event: DomainEvent): boolean {
+    return event instanceof TimerEvent
+  }
+}
+
 // Event
 export class ScreenScheduled extends ScreenEvent {
   readonly name = "ScreenScheduled"
@@ -76,4 +86,11 @@ export class SeatChosenCancelled extends SeatChosenCancellationEvent {
 
 export class SeatChosenCancellationRefused extends SeatChosenCancellationEvent {
   readonly name = "SeatChosenCancellationRefused"
+}
+
+export class OneMinutePassed extends TimerEvent {
+  readonly name = "OneMinutePassed"
+  relatedTo(event: DomainEvent): boolean {
+    return event instanceof TimerEvent
+  }
 }

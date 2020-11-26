@@ -31,3 +31,8 @@ export interface ReadModel {
 export interface ReadModelResponse {
   data: any
 }
+
+export interface Policy<E extends DomainEvent> {
+  handleEvent(event: E): void
+  canHandle(event: E): boolean
+}
