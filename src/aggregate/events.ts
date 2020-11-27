@@ -54,7 +54,7 @@ export abstract class TimerEvent implements DomainEvent {
 // Event
 export class ScreenScheduled extends ScreenEvent {
   readonly name = "ScreenScheduled"
-  constructor(readonly screenId: ScreenId, readonly startTime: Date) {
+  constructor(readonly screenId: ScreenId, readonly title: string, readonly startTime: Date = new Date()) {
     super(screenId)
   }
 }

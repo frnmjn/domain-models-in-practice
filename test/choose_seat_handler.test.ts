@@ -19,26 +19,26 @@ describe("A Customer choose specific seats at a specific screening (for simplici
   })
 
   it("If available, the seats should be chosen.", async () => {
-    testFramework.given([new ScreenScheduled(screen1, tomorrow)])
+    testFramework.given([new ScreenScheduled(screen1, "matrix", tomorrow)])
     testFramework.when(new ChooseSeat(customer1, screen1, Row.A, Col.ONE))
     testFramework.then([new SeatChosen(customer1, screen1, seat1)])
   })
 
   it("If not available, the seats should not be chosen.", async () => {
-    testFramework.given([new ScreenScheduled(screen1, tomorrow), new SeatChosen(customer1, screen1, seat1)])
+    testFramework.given([new ScreenScheduled(screen1, "matrix", tomorrow), new SeatChosen(customer1, screen1, seat1)])
     testFramework.when(new ChooseSeat(customer2, screen1, Row.A, Col.ONE))
     testFramework.then([new SeatChosenRefused(customer2, screen1, seat1)])
   })
 
   it("If available but 15 mins before start, the seats should not be chosen.", async () => {
-    testFramework.given([new ScreenScheduled(screen1, new Date())])
+    testFramework.given([new ScreenScheduled(screen1, "matrix", new Date())])
     testFramework.when(new ChooseSeat(customer1, screen1, Row.A, Col.ONE))
     testFramework.then([new SeatChosenRefused(customer1, screen1, seat1)])
   })
 
   it("If choice is cancelled, the seats should be chosen.", async () => {
     testFramework.given([
-      new ScreenScheduled(screen1, tomorrow),
+      new ScreenScheduled(screen1, "matrix", tomorrow),
       new SeatChosen(customer1, screen1, seat1),
       new SeatChosenCancelled(customer1, screen1, seat1),
     ])

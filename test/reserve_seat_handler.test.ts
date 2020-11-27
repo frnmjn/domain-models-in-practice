@@ -19,14 +19,14 @@ describe("A Customer reserves specific seats at a specific screening (for simpli
   })
 
   it("If available, the seats should be reserved.", async () => {
-    testFramework.given([new ScreenScheduled(screen1, tomorrow)])
+    testFramework.given([new ScreenScheduled(screen1, "matrix", tomorrow)])
     testFramework.when(new ReserveSeat(customer1, screen1, Row.A, Col.ONE))
     testFramework.then([new SeatReserved(customer1, screen1, new Seat(Row.A, Col.ONE))])
   })
 
   it("If not available, the seats should not be reserved.", async () => {
     testFramework.given([
-      new ScreenScheduled(screen1, tomorrow),
+      new ScreenScheduled(screen1, "matrix", tomorrow),
       new SeatReserved(customer1, screen1, new Seat(Row.A, Col.ONE)),
     ])
     testFramework.when(new ReserveSeat(customer2, screen1, Row.A, Col.ONE))
@@ -34,7 +34,7 @@ describe("A Customer reserves specific seats at a specific screening (for simpli
   })
 
   it("If available but 15 mins before start, the seats should not be reserved.", async () => {
-    testFramework.given([new ScreenScheduled(screen1, new Date())])
+    testFramework.given([new ScreenScheduled(screen1, "matrix", new Date())])
     testFramework.when(new ReserveSeat(customer1, screen1, Row.A, Col.ONE))
     testFramework.then([new SeatReservationRefused(customer1, screen1, new Seat(Row.A, Col.ONE))])
   })

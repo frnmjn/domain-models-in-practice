@@ -17,6 +17,8 @@ import { expect } from "chai"
 import { ChooseSeatHandler } from "../src/command_handler/choose_seat_handler"
 import { CancellationChoicePolicy } from "../src/policy/cancellation_choice_policy"
 import { CancellationChoiceHandler } from "../src/command_handler/cancellation_choice_handler"
+import { ScreeningListQueryHandler } from "../src/query_handler/screening_list_handler"
+import { ScreeningList } from "../src/read_model/screening_list"
 
 export class TestFramework {
   eventStore: EventStore
@@ -43,7 +45,8 @@ export class TestFramework {
     // Read Model List
     const customerReservation = new CustomerReservation([])
     const chosenSeats = new ChosenSeats([])
-    this.readModels = [customerReservation, chosenSeats]
+    const screeningList = new ScreeningList([])
+    this.readModels = [customerReservation, chosenSeats, screeningList]
 
     const commandBus = (c: Command) => {
       this.publishedCommands.push(c)
@@ -53,6 +56,9 @@ export class TestFramework {
 
     this.queyHandlers = [
       new MyReservationHandler(customerReservation, (res: ReadModelResponse) => {
+        this.response = res
+      }),
+      new ScreeningListQueryHandler(screeningList, (res: ReadModelResponse) => {
         this.response = res
       }),
     ]
