@@ -26,7 +26,7 @@ describe("A Customer choose specific seats at a specific screening (for simplici
 
   it("should cancelled after 12 mins if the reservation process is not over", async () => {
     testFramework.given([
-      new ScreenScheduled(screen1, tomorrow),
+      new ScreenScheduled(screen1, "matrix", tomorrow),
       new SeatChosen(customer1, screen1, seat1, thirteenMinutesAgo),
     ])
     testFramework.when(new CancellationChoice(customer1, screen1, Row.A, Col.ONE))
@@ -35,7 +35,7 @@ describe("A Customer choose specific seats at a specific screening (for simplici
 
   it("should not be cancelled after less then 12 mins if the reservation process is over", async () => {
     testFramework.given([
-      new ScreenScheduled(screen1, tomorrow),
+      new ScreenScheduled(screen1, "matrix", tomorrow),
       new SeatChosen(customer1, screen1, seat1, tenMinutesAgo),
     ])
     testFramework.when(new CancellationChoice(customer1, screen1, Row.A, Col.ONE))
