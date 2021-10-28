@@ -93,22 +93,14 @@ workflows:
       - test:
           filters:
             branches:
-              ignore: master
+              ignore: main
   dev:
     jobs:
       - test:
           filters:
             branches:
               only:
-                - master
-  prod:
-    jobs:
-      - test:
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v.*/
+                - main
       - docker:
           name: docker-prod-4-dev
           context: raffaella-dev
@@ -117,6 +109,14 @@ workflows:
               only: /^v.*/
           requires:
             - test
+  prod:
+    jobs:
+      - test:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
       - docker:
           name: docker-prod-4-prod
           context: raffaella-prod
