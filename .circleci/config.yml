@@ -1,0 +1,152 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@4.1.0
+  gcp-cli: circleci/gcp-cli@1.8.5
+  gcp-gcr: circleci/gcp-gcr@0.13.0
+  gcp-gke: circleci/gcp-gke@1.2.0
+
+jobs:
+  test:
+    docker:
+      - image: "cimg/base:stable"
+      - image: rabbitmq:3-management
+        environment:
+          RABBITMQ_DEFAULT_USER: "rabbit"
+          RABBITMQ_DEFAULT_PASS: "rabbit"
+      - image: circleci/postgres:11.6-alpine
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: password1
+    executor:
+      name: node/default
+      tag: "10.22"
+    steps:
+      - checkout
+      - node/install
+      - node/install-packages
+      - run: npm run test
+  docker:
+    executor: gcp-gcr/default
+    steps:
+      - checkout:
+          path: ~/project
+      # - run:
+      #     name: GOOGLE_PROJECT_ID
+      #     command: |
+      #       echo ${GOOGLE_PROJECT_ID}
+      - gcp-gcr/gcr-auth
+      # - run:
+      #     name: download config files
+      #     command: |
+      #       BOTO_CONFIG=/dev/null gsutil cp gs://${GOOGLE_PROJECT_ID}-server/postgres_client_cert.pem postgres_client_cert.pem
+      #       BOTO_CONFIG=/dev/null gsutil cp gs://${GOOGLE_PROJECT_ID}-server/postgres_client_key.pem postgres_client_key.pem
+      #       BOTO_CONFIG=/dev/null gsutil cp gs://${GOOGLE_PROJECT_ID}-server/postgres_server_ca.pem postgres_server_ca.pem
+      - gcp-gcr/build-image:
+          registry-url: eu.gcr.io
+          image: domain-models-in-practice
+          tag: production
+          no_output_timeout: 20m
+      - gcp-gcr/push-image:
+          registry-url: eu.gcr.io
+          image: domain-models-in-practice
+          tag: production
+          digest-path: /tmp/digest.txt
+      - gcp-gcr/tag-image:
+          registry-url: eu.gcr.io
+          image: domain-models-in-practice
+          source-tag: production
+          target-tag: ${CIRCLE_SHA1}
+  rollout:
+    docker:
+      - image: "cimg/base:stable"
+    description: "image rollout"
+    steps:
+      - checkout:
+          path: ~/project
+      - gcp-gke/install
+      - run:
+          name: activate service account
+          command: |
+            echo ${GCLOUD_SERVICE_KEY} | gcloud auth activate-service-account --key-file=-
+      - run:
+          name: set project
+          command: |
+            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+      - run:
+          name: set region
+          command: |
+            echo 'export GOOGLE_COMPUTE_ZONE=europe-west2' >> $BASH_ENV
+            source $BASH_ENV
+      - gcp-gke/update-kubeconfig-with-credentials:
+          cluster: prod
+          perform-login: true
+      - run:
+          name: Roolout
+          command: |
+            kubectl set image deployment domain-models-in-practice domain-models-in-practice=eu.gcr.io/${GOOGLE_PROJECT_ID}/domain-models-in-practice:${CIRCLE_TAG}
+
+workflows:
+  feature:
+    jobs:
+      - test:
+          filters:
+            branches:
+              ignore: master
+  dev:
+    jobs:
+      - test:
+          filters:
+            branches:
+              only:
+                - master
+      - deploy:
+          name: deploy-dev
+          context: raffaella-dev
+          requires:
+            - test
+          filters:
+            branches:
+              only:
+                - master
+  prod:
+    jobs:
+      - test:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - deploy:
+          name: deploy-prod
+          context: raffaella-prod
+          filters:
+            tags:
+              only: /^v.*/
+          requires:
+            - test
+      - docker:
+          name: docker-prod-4-dev
+          context: raffaella-dev
+          filters:
+            tags:
+              only: /^v.*/
+          requires:
+            - deploy-prod
+      - docker:
+          name: docker-prod-4-prod
+          context: raffaella-prod
+          filters:
+            tags:
+              only: /^v.*/
+          requires:
+            - deploy-prod
+      - rollout:
+          name: rollout-prod-4-prod
+          context: raffaella-prod
+          filters:
+            tags:
+              only: /^v.*/
+          requires:
+            - docker-prod-4-prod

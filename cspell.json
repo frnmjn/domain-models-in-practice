@@ -1,4 +1,13 @@
 {
     "version": "0.1",
-    "language": "en"
+    "language": "en",
+    "words": [
+        "BOTO",
+        "cimg",
+        "circleci",
+        "GCLOUD",
+        "gsutil",
+        "RABBITMQ",
+        "raffaella"
+    ]
 }
