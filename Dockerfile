@@ -12,7 +12,6 @@ FROM node:12-alpine AS app
 WORKDIR /app
 
 COPY --from=build /app/dist ./dist
-COPY --from=build /app/migrations ./migrations
 COPY --from=build /app/*pem ./
 COPY --from=build /app/package* ./
 COPY --from=build /app/node_modules ./node_modules
