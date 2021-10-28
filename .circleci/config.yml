@@ -116,7 +116,7 @@ workflows:
             tags:
               only: /^v.*/
           requires:
-            - deploy-prod
+            - test
       - docker:
           name: docker-prod-4-prod
           context: raffaella-prod
@@ -124,7 +124,7 @@ workflows:
             tags:
               only: /^v.*/
           requires:
-            - deploy-prod
+            - test
       - rollout:
           name: rollout-prod-4-prod
           context: raffaella-prod
