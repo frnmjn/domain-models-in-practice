@@ -101,15 +101,6 @@ workflows:
             branches:
               only:
                 - master
-      - deploy:
-          name: deploy-dev
-          context: raffaella-dev
-          requires:
-            - test
-          filters:
-            branches:
-              only:
-                - master
   prod:
     jobs:
       - test:
@@ -118,14 +109,6 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v.*/
-      - deploy:
-          name: deploy-prod
-          context: raffaella-prod
-          filters:
-            tags:
-              only: /^v.*/
-          requires:
-            - test
       - docker:
           name: docker-prod-4-dev
           context: raffaella-dev
